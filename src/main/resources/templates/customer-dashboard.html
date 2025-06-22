@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily News - Customer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: var(--dark);
+            scroll-behavior: smooth;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--light);
+        }
+        
+        .sidebar {
+            background-color: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding-top: 20px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+            border-radius: 5px;
+            padding: 10px 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .card-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary);
+        }
+        
+        .newspaper-card {
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .subscription-card {
+            border-left: 4px solid var(--success);
+        }
+        
+        .address-card {
+            border-left: 4px solid var(--warning);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        .newspaper-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .newspaper-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .badge-subscription {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .badge-language {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .edit-profile-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-img:hover {
+            transform: scale(1.1);
+        }
+        
+        .payment-method {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--secondary);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--secondary);
+            background-color: rgba(52, 152, 219, 0.05);
+            box-shadow: 0 0 0 1px var(--secondary);
+        }
+        .settings-card {
+           background: white;
+           border-radius: 10px;
+           padding: 20px;
+           box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+           max-width: 500px;
+       }
+       .form-group {
+           margin-bottom: 15px;
+       }
+       
+       .form-group label {
+           display: block;
+           margin-bottom: 5px;
+           font-weight: 500;
+           color: var(--dark);
+       }
+       
+       .save-btn {
+           background: var(--primary);
+           color: white;
+           border: none;
+           padding: 10px 20px;
+           border-radius: 6px;
+           cursor: pointer;
+           font-weight: 500;
+       }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stats-card i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .stats-card h2 {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stats-card p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+        
+        .toggle-sidebar {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1100;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .toggle-sidebar {
+                display: block;
+            }
+        }
+        
+        /* Loading spinner */
+        .spinner-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast notification */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1500;
+        }
+        
+        .toast {
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.hide {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        /* Star rating */
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        
+        .rating input {
+            display: none;
+        }
+        
+        .rating label {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .rating label:hover,
+        .rating label:hover ~ label,
+        .rating input:checked ~ label {
+            color: #ffc107;
+        }
+
+        /* Payment card delete button */
+        .payment-method .delete-card {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .payment-method:hover .delete-card {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div class="spinner-container" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Toggle Sidebar Button (Mobile) -->
+    <button class="toggle-sidebar" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar col-md-3 col-lg-2 d-md-block" id="sidebar">
+        <div class="text-center mb-4">
+            <h3>News To You</h3>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-section="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="newspapers">
+                    <i class="fas fa-newspaper"></i> Available Newspapers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="subscriptions">
+                    <i class="fas fa-newspaper"></i> My Subscriptions
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="deliveries">
+                    <i class="fas fa-truck"></i> Delivery History
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="payments">
+                    <i class="fas fa-credit-card"></i> Payments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="profile">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="feedback">
+                    <i class="fas fa-star"></i> Feedback
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <form th:action="@{/customer/logout}" method="post">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Dashboard Section -->
+        <div class="section active" id="dashboard-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Welcome back, <span th:text="${customer.name}">Customer</span>!</h2>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" data-section="profile"><i class="fas fa-user-edit me-2"></i>Edit Profile</a></li>
+                       <!-- <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="fas fa-key me-2"></i>Change Password</a></li>-->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #3498db, #2c3e50);">
+                        <i class="fas fa-newspaper"></i>
+                        <h2 th:text="${customer.subscriptions.size}" id="activeSubscriptionsCount">3</h2>
+                        <p>Active Subscriptions</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #27ae60, #16a085);">
+                        <i class="fas fa-calendar-check"></i>
+                        <h2>Tomorrow</h2>
+                        <p>Next Delivery</p>
+                    </div>
+                </div>
+            
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card mb-4">
+                <h3 class="card-title">Quick Actions</h3>
+                <div class="row text-center">
+                    <div class="col-md-3 col-6 mb-3">
+                        <button class="btn btn-outline-primary w-100 py-3" data-section="newspapers">
+                            <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
+                            Add Subscription
+                        </button>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <button class="btn btn-outline-success w-100 py-3" data-section="payments">
+                            <i class="fas fa-rupee-sign fa-2x mb-2"></i><br>
+                            Payment History
+                        </button>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <button class="btn btn-outline-info w-100 py-3" data-section="deliveries">
+                            <i class="fas fa-history fa-2x mb-2"></i><br>
+                            Delivery History
+                        </button>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <button class="btn btn-outline-warning w-100 py-3" data-bs-toggle="modal" data-bs-target="#supportModal">
+                            <i class="fas fa-headset fa-2x mb-2"></i><br>
+                            Get Help
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Deliveries -->
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="card-title">Recent Deliveries</h3>
+                    <a href="#" data-section="deliveries" class="btn btn-sm btn-outline-secondary">View All</a>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Newspaper</th>
+                                <th>Delivery Time</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="delivery : ${recentDeliveries}">
+                                <td th:text="${#temporals.format(delivery.time,'dd MMMM yyyy')}">Today</td>
+                                <td>
+                                    <img th:src="${delivery.subscription.newspaper.b64Photo}" alt="Times of India" class="me-2" style="width: 30px;">
+                                    <span th:text="${delivery.subscription.newspaper.name}"></span>
+                                </td>
+                                <td th:text="${#temporals.format(delivery.time,'hh:mm a').toUpperCase()}">7:15 AM</td>
+                                <td><span class="badge bg-success">Delivered</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deliveryDetailsModal"
+                                            th:data-delivery-id="${delivery.id}"
+                                            th:data-newspaper="${delivery.subscription.newspaper.name}"
+                                            th:data-delivery-time="${#temporals.format(delivery.time,'dd MMMM yyyy - hh:mm a')}"
+                                            th:data-delivery-boy="${delivery.employee.name}"
+                                            th:data-delivery-boy-phone="${delivery.employee.phoneNumber}">
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Newspapers Section -->
+        <div class="section" id="newspapers-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Available Newspapers</h2>
+                <button class="btn btn-outline-secondary" data-section="dashboard">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </button>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="card-title">Browse Newspapers</h3>
+                    <div>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search newspapers..." id="newspaperSearch">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <select class="form-select" id="languageFilter">
+                            <option value="">All Languages</option>
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Marathi">Marathi</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="priceFilter">
+                            <option value="">All Prices</option>
+                            <option value="0-300">Under ₹300</option>
+                            <option value="300-500">₹300 - ₹500</option>
+                            <option value="500-1000">₹500 - ₹1000</option>
+                            <option value="1000+">Over ₹1000</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row" id="newspapersContainer">
+                    <div class="col-md-4 mb-4" th:each="paper : ${papers}">
+                        <div class="dashboard-card newspaper-card h-100">
+                            <img th:src="${paper.photo}" id="photo" alt="Newspaper" class="newspaper-img mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5 th:text="${paper.name}">Newspaper Name</h5>
+                                <span class="badge badge-language" id="language" th:text="${paper.language}">English</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="monthlyPrice text-primary fw-bold" id="monthlyPrice" th:text="'₹' + ${#numbers.formatDecimal(paper.monthlyPrice, 1, 2)}+ '/Month'">₹15.00</span>
+                                <span class="yearlyPrice text-primary fw-bold" id="yearlyPrice" th:text="'₹' + ${#numbers.formatDecimal(paper.yearlyPrice, 1, 2)}+ '/Year'">₹15.00</span>
+                            </div>
+                            <p class="text-muted small mb-3" id="description" th:text="${paper.description} ?: 'Daily morning delivery'">Daily morning delivery</p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary btn-sm subscribe-btn"
+                                    th:data-paper-id="${paper.id}"
+                                    th:data-paper-name="${paper.name}"
+                                    th:data-paper-monthlyPrice="${paper.monthlyPrice}"
+                                    th:data-paper-yearlyPrice="${paper.yearlyPrice}"
+                                    th:data-paper-description="${paper.description}">
+                                    <i class="fas fa-plus-circle"></i> Subscribe
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Subscriptions Section -->
+        <div class="section" id="subscriptions-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>My Subscriptions</h2>
+                <button class="btn btn-outline-secondary" data-section="dashboard">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </button>
+            </div>
+            
+            <div class="dashboard-card subscription-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="card-title">Active Subscriptions</h3>
+                    <button class="btn btn-sm btn-primary" data-section="newspapers">
+                        <i class="fas fa-plus"></i> Add Subscription
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Newspaper</th>
+                                <th>Language</th>
+                                <th>Price</th>
+                                <th>Billing Cycle</th>
+                                <th>Next Delivery</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="sub : ${customer.subscriptions}">
+                                <td>
+                                    <img th:src="${sub.newspaper.b64Photo}" style="width: 30px;">
+                                    <span th:text="${sub.newspaper.name}"></span>
+                                </td>
+                                <td th:text="${sub.newspaper.language.displayName}">English</td>
+                                <td th:text="${sub.actualPrice}">₹450/month</td>
+                                <td th:text="${sub.type}">Monthly</td>
+                                <td>Tomorrow</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#subscriptionDetailsModal"
+                                            th:data-sub-id="${sub.id}"
+                                            th:data-paper-name="${sub.newspaper.name}"
+                                            th:data-paper-language="${sub.newspaper.language.displayName}"
+                                            th:data-start-date="${#temporals.format(sub.createdTime, 'dd MMMM yyyy')}"
+                                            th:data-next-billing="${#temporals.format(sub.endDate, 'dd MMMM yyyy')}"
+                                            th:data-billing-cycle="${sub.type}"
+                                            th:data-price="${sub.actualPrice}"
+                                            th:data-status="Active">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                  <!--  <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-times"></i>
+                                    </button> -->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4">
+                    <h5 class="card-title">Subscription Summary</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <strong>Total Monthly Cost:</strong> ₹1,250
+                            </div>
+                        </div>
+                       <!-- <div class="col-md-6">
+                            <div class="alert alert-warning">
+                                <strong>Next Billing Date:</strong> 15th July 2023
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivery History Section -->
+        <div class="section" id="deliveries-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Delivery History</h2>
+                <button class="btn btn-outline-secondary" data-section="dashboard">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </button>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="card-title">Past Deliveries</h3>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="date" class="form-control" id="deliveryDateFilter">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Newspaper</th>
+                                <th>Delivery Time</th>
+                                <th>Status</th>
+                                <th>Delivery Boy</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="delivery : ${deliveries}">
+                                <td th:text="${#temporals.format(delivery.time, 'dd/MMM/yyyy')}">10 July 2023</td>
+                                <td th:text="${delivery.subscription.newspaper.name}">Times of India</td>
+                                <td th:text="${#temporals.format(delivery.time, 'hh:mm a')}">7:15 AM</td>
+                                <td><span class="badge bg-success">Delivered</span></td>
+                                <td th:text="${delivery.employee.name}">Rahul Sharma</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deliveryDetailsModal"
+                                            th:data-delivery-id="${delivery.id}"
+                                            th:data-newspaper="${delivery.subscription.newspaper.name}"
+                                            th:data-delivery-time="${#temporals.format(delivery.time,'dd MMMM yyyy - hh:mm a')}"
+                                            th:data-delivery-boy="${delivery.employee.name}"
+                                            th:data-delivery-boy-phone="${delivery.employee.phoneNumber}">
+                                        <i class="fas fa-eye"></i> Details
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+             <!--   <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>-->
+            </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="section" id="payments-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Payments</h2>
+                <button class="btn btn-outline-secondary" data-section="dashboard">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </button>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="dashboard-card mb-4">
+                        <h3 class="card-title">Payment Methods</h3>
+                        
+                        <div class="row mt-4" id="paymentMethodsContainer">
+                            <div class="col-md-6 mb-3" th:each="card : ${customer.cards}">
+                                <div class="payment-method">
+                                    <button class="btn btn-sm btn-danger delete-card" 
+                                            th:data-card-id="${card.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <div class="d-flex align-items-center">
+                                        <i class="far fa-credit-card fa-2x me-3"></i>
+                                        <div>
+                                            <h6 th:text="${card.cardHolderName}">John Doe</h6>
+                                            <p class="mb-1" th:text="'**** **** **** ' + ${card.cardNumber.substring(card.cardNumber.length() - 4)}">**** **** **** 4242</p>
+                                            <p class="text-muted small" th:text="${card.expiryDate}">Expires 12/25</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="payment-method d-flex align-items-center justify-content-center" 
+                                     style="height: 100%; cursor: pointer;"
+                                     data-bs-toggle="modal" 
+                                     data-bs-target="#addPaymentMethodModal">
+                                    <div class="text-center">
+                                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                        <p>Add Payment Method</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h3 class="card-title">Payment History</h3>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="sub : ${customer.subscriptions}">
+                                        <td th:text="${#temporals.format(sub.createdTime, 'dd MMMM yyyy - hh:mm a')}">15 June 2023</td>
+                                        <td th:text="${'₹'+sub.actualPrice}">₹1,250</td>
+                                        <td>Card</td>
+                                        <td><span class="badge bg-success">Completed</span></td>
+                                       
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="section" id="profile-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>My Profile</h2>
+                <button class="btn btn-outline-secondary" data-section="dashboard">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </button>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Personal Information</h3>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+                
+                <div class="row mt-4">
+                    
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Name:</strong> <span th:text="${customer.name}">John Doe</span></p>
+                                <p><strong>Email:</strong> <span th:text="${customer.user.email}">john@example.com</span></p>
+                                
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Phone:</strong> <span th:text="${customer.phoneNumber}">+91 9876543210</span></p>
+                                <p><strong>Date of Birth:</strong> <span th:text="${#temporals.format(customer.dob, 'dd MMMM yyyy')}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Address Section -->
+            <div class="dashboard-card address-card mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Delivery Address</h3>
+                    <button th:if="${customer.address == null}" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <i class="fas fa-edit"></i> Add Address
+                    </button>
+                    <button th:unless="${customer.address == null}" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editAddressModal">
+                        <i class="fas fa-edit"></i> Edit Address
+                    </button>
+                </div>
+                
+                <div class="mt-4" th:if="${customer.address}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="address-display p-4 bg-light rounded">
+                                <h5><i class="fas fa-home me-2"></i> Primary Address</h5>
+                                <hr>
+                                <p th:text="${customer.address.houseNumber + ', ' + customer.address.street}">123, Main Street</p>
+                                <p th:text="${customer.address.city + ', ' + customer.address.district}">Mumbai, Mumbai Suburban</p>
+                                <p th:text="${customer.address.state.displayName + ' - ' + customer.address.pincode}">Maharashtra - 400001</p>
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-info h-100">
+                                <h5><i class="fas fa-info-circle me-2"></i> Delivery Instructions</h5>
+                                <p th:if="${customer.address.deliveryInstructions == null}">No Delivery Instructions.</p>
+                                <p th:unless="${customer.address.deliveryInstructions == null}" th:text="${customer.address.deliveryInstructions}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-warning mt-3" th:unless="${customer.address}">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i> No Address Found</h5>
+                    <p class="mb-0">No delivery address added yet. Please add your address to receive newspapers.</p>
+                </div>
+            </div>
+            
+            <div class="settings-card mt-4">
+                <h3 class="mb-4">Change Password</h3>
+                
+                <form id="change-password-form">
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" class="form-control" required minlength="4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm New Password</label>
+                        <input type="password" id="confirm-password" class="form-control" required minlength="4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <span id="password-error" class="text-danger ms-3" style="display: none;"></span>
+                        <span id="password-success" class="text-success ms-3" style="display: none;"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div class="section" id="feedback-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Feedback</h2>
+                <button class="btn btn-outline-secondary" data-section="dashboard">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </button>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3 class="card-title">Submit Feedback</h3>
+                <p>We value your feedback to improve our service. Please share your experience with us.</p>
+                
+                <form id="feedbackForm" th:action="@{/customer/feedback/submit}" method="post">
+                   <!-- <div class="mb-4">
+                        <label class="form-label">Select Delivery to Provide Feedback:</label>
+                        <select class="form-select" id="feedbackDeliverySelect" name="deliveryId" required>
+                            <option value="">Select a delivery</option>
+                            <option th:each="delivery : ${deliveries}" 
+                                    th:value="${delivery.id}"
+                                    th:text="${delivery.subscription.newspaper.name + ' - ' + #temporals.format(delivery.time, 'dd MMMM yyyy')}">
+                            </option>
+                        </select>
+                    </div> -->
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Rating:</label>
+                        <div class="rating">
+                            <input type="radio" id="star5" name="rating" value="5" required>
+                            <label for="star5" title="Excellent">★</label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4" title="Good">★</label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3" title="Average">★</label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2" title="Poor">★</label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1" title="Very Poor">★</label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="feedbackComments" class="form-label">Comments (Optional)</label>
+                        <textarea class="form-control" id="feedbackComments" name="message" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i> Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="dashboard-card mt-4">
+                <h3 class="card-title">Your Previous Feedback</h3>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                               <!--<th>Newspaper</th>-->
+                                <th>Rating</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="feedback : ${feedbacks}">
+                                <td th:text="${#temporals.format(feedback.time, 'dd MMMM yyyy')}">15 June 2023</td>
+                               <!-- <td th:text="${feedback.delivery.subscription.newspaper.name}">Times of India</td>-->
+                                <td>
+                                    <span th:switch="${feedback.rating}">
+                                        <span th:case="5">★★★★★</span>
+                                        <span th:case="4">★★★★☆</span>
+                                        <span th:case="3">★★★☆☆</span>
+                                        <span th:case="2">★★☆☆☆</span>
+                                        <span th:case="1">★☆☆☆☆</span>
+                                    </span>
+                                </td>
+                                <td th:text="${feedback.message} ?: 'No comments'">Good service</td>
+                            </tr>
+                            <tr th:if="${feedbacks == null}">
+                                <td colspan="4" class="text-center">No feedback submitted yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/customer/profile/update}" method="post" id="profileForm" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row">
+                          
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="editName" class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="editName" th:value="${customer.name}" name="name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="editEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="editEmail" th:value="${customer.user.email}" name="email" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="editPhone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="editPhone" th:value="${customer.phoneNumber}" name="phoneNumber" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="editDob" class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" id="editDob" name="dob" th:value="${customer.dob}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Address Modal -->
+    <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAddressModalLabel">Edit Delivery Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/customer/address/update}" method="post" id="addressForm">
+                    <input th:value="${customer.id}" type="hidden" name="customerId" id="customerId">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="houseNumber" class="form-label">House/Flat No.</label>
+                                <input type="text" class="form-control" id="houseNumber" th:value="${customer.address?.houseNumber}" name="houseNumber" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="street" class="form-label">Street</label>
+                                <input type="text" class="form-control" id="street" th:value="${customer.address?.street}" name="street" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" th:value="${customer.address?.city}" name="city" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="district" class="form-label">District</label>
+                                <input type="text" class="form-control" id="district" th:value="${customer.address?.district}" name="district" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="state" class="form-label">State</label>
+                                <select class="form-select" id="state" name="state" required>
+                                    <option th:each="state : ${T(com.news.enums.State).values()}" 
+                                            th:value="${state}" 
+                                            th:text="${state.displayName}"
+                                            th:selected="${customer.address?.state.displayName == state.displayName}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="pincode" class="form-label">Pincode</label>
+                                <input type="text" class="form-control" id="pincode" th:value="${customer.address?.pincode}" name="pincode" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="landmark" class="form-label">Landmark (Optional)</label>
+                            <input type="text" class="form-control" id="landmark" th:value="${customer.address?.landmark}" name="landmark">
+                        </div>
+                        <div class="mb-3">
+                            <label for="deliveryInstructions" class="form-label">Delivery Instructions</label>
+                            <textarea class="form-control" id="deliveryInstructions" rows="2" name="deliveryInstructions" th:text="${customer.address?.deliveryInstructions}"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Address</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Address Modal -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addAddressForm" th:action="@{/customer/address/add}" method="post">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="newHouseNumber" class="form-label">House/Flat No.</label>
+                                <input type="text" name="newHousenumber" class="form-control" id="newHouseNumber" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="newStreet" class="form-label">Street</label>
+                                <input type="text" name="newStreet" class="form-control" id="newStreet" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="newCity" class="form-label">City</label>
+                                <input type="text" name="newCity" class="form-control" id="newCity" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="newDistrict" class="form-label">District</label>
+                                <input type="text" name="newDistrict" class="form-control" id="newDistrict" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="newState" class="form-label">State</label>
+                                <select class="form-select" name="newState" id="newState" required>
+                                    <option th:each="state : ${T(com.news.enums.State).values()}" 
+                                            th:value="${state}" 
+                                            th:text="${state}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="newPincode" class="form-label">Pincode</label>
+                                <input type="text" name="newPincode" class="form-control" id="newPincode" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newLandmark" class="form-label">Landmark (Optional)</label>
+                            <input type="text" name="newLandmark" class="form-control" id="newLandmark">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDeliveryInstructions" class="form-label">Delivery Instructions</label>
+                            <textarea class="form-control" name="newDeliveryInstructions" id="newDeliveryInstructions" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Address</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="modal fade" id="subscribeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Subscribe to <span id="newspaperName">Newspaper</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6>Select Billing Cycle:</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="billingCycleOption" id="monthly" value="MONTHLY" checked>
+                            <label class="form-check-label" for="monthly" id="monthlyLabel">
+                                Monthly
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="billingCycleOption" id="yearly" value="YEARLY">
+                            <label class="form-check-label" for="yearly" id="yearlyLabel">
+                                Yearly
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6>Delivery Time:</h6>
+                        <span>6:00 AM - 9:00 AM</span>
+                    </div>
+                    <input type="hidden" th:value="${customer.address}" id="customerAddress">
+
+                    <div class="mb-4">
+                        <h6>Your Delivery Address:</h6>
+                        <div th:if="${customer.address != null}">
+                            <p>
+                                <span th:text="${customer.address.houseNumber + ', '}"></span>
+                                <span th:text="${customer.address.street + ', '}"></span>
+                                <span th:text="${customer.address.city + ', '}"></span>
+                                <span th:text="${customer.address.district + ', '}"></span>
+                                <span th:text="${customer.address.state.displayName + ' - '}"></span>
+                                <span th:text="${customer.address.pincode}"></span>
+                            </p>
+                        </div>
+                        <span th:unless="${customer.address != null}">
+                            Your address is not provided. Please update your address in the Profile section before proceeding. 
+                        </span>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> Your subscription will start from tomorrow.
+                    </div>
+
+                    <!-- Hidden fields for backend -->
+                    <input type="hidden" id="newsPaperId" name="newspaperId">
+                    <input type="hidden" id="paperName" name="paperName">
+                    <input type="hidden" id="selectedBillingCycle" name="billingCycle">
+                    <input type="hidden" id="selectedPrice" name="price">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="proceedToPaymentBtn" class="btn btn-primary">Proceed to Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Details Modal -->
+    <div class="modal fade" id="subscriptionDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Subscription Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img src="https://via.placeholder.com/150" alt="Newspaper" class="img-fluid rounded mb-3">
+                            <h4 id="subscriptionPaperName">Times of India</h4>
+                            <p class="text-muted" id="subscriptionLanguage">English Newspaper</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Subscription ID:</strong> <span id="subscriptionId">SUB-123456</span></p>
+                                    <p><strong>Start Date:</strong> <span id="subscriptionStartDate">15 June 2023</span></p>
+                                    <p><strong>Next Billing Date:</strong> <span id="subscriptionNextBilling">15 July 2023</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Billing Cycle:</strong> <span id="subscriptionBillingCycle">Monthly</span></p>
+                                    <p><strong>Price:</strong> <span id="subscriptionPrice">₹450/month</span></p>
+                                    <p><strong>Status:</strong> <span class="badge bg-success" id="subscriptionStatus">Active</span></p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="mb-3">
+                                <h6>Delivery Details</h6>
+                                <p><strong>Address:</strong> 123, Main Street, Mumbai - 400001</p>
+                                <p><strong>Delivery Time:</strong> 7:00 AM - 9:00 AM</p>
+                                <p><strong>Delivery Instructions:</strong> Please deliver at main gate</p>
+                            </div>
+                            <hr>
+                            <div class="mb-3">
+                                <h6>Payment Method</h6>
+                                <p><i class="far fa-credit-card me-2"></i> Credit Card ending with 4242</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-primary">
+                        <i class="fas fa-print"></i> Print Invoice
+                    </button>
+                    <button type="button" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Cancel Subscription
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Details Modal -->
+    <div class="modal fade" id="deliveryDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delivery Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div class="delivery-status-icon">
+                            <i class="fas fa-check-circle fa-4x text-success"></i>
+                        </div>
+                        <h4 class="mt-3">Delivery Completed</h4>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Newspaper:</strong> <span id="deliveryNewspaper">Times of India</span></p>
+                            <p><strong>Delivery Date:</strong> <span id="deliveryTime">10 July 2023</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Delivery Boy:</strong> <span id="deliveryBoy">Rahul Sharma</span></p>
+                            <p><strong>Contact:</strong> <span id="deliveryBoyPhone">+91 9876543210</span></p>
+                            <p><strong>Status:</strong> <span class="badge bg-success">Delivered</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6>Delivery Address:</h6>
+                        <p>123, Main Street, Mumbai - 400001</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> Request Redelivery
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Payment Method Modal -->
+    <div class="modal fade" id="addPaymentMethodModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Payment Method</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-4" id="paymentMethodTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="card-tab" data-bs-toggle="tab" data-bs-target="#card" type="button" role="tab">
+                                <i class="far fa-credit-card me-2"></i> Card
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="paymentMethodTabsContent">
+                        <div class="tab-pane fade show active" id="card" role="tabpanel">
+                            <form id="addCardForm" th:action="@{/customer/card/add}" method="post">
+                                <div class="mb-3">
+                                    <label for="cardNumber" class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" name="cardNumber" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cardExpiry" class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" name="cardExpiry" id="cardExpiry" placeholder="MM/YY" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cardCvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" name="cardCvv" id="cardCvv" placeholder="123" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cardName" class="form-label">Name on Card</label>
+                                    <input type="text" class="form-control" name="cardName" id="cardName" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="savePaymentMethodBtn">
+                                        <i class="fas fa-save"></i> Save Payment Method
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Confirmation Modal -->
+    <div class="modal fade" id="paymentConfirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-credit-card fa-4x text-primary mb-3"></i>
+                        <h4>Payment Summary</h4>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subscriptions (incld. taxes):</span>
+                            <span type="text" id="subscriptionAmount1"></span>
+                        </div>
+                        <div hidden id="paymentDetails"></div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total Amount:</span>
+                            <span id="subscriptionAmount2"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Payment Method</h6>
+                        <div class="payment-method selected mb-3" th:each="card : ${customer.cards}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" th:value="${card.id}" name="cardId" id="cardId" checked>
+                                <label class="form-check-label" for="cardId">
+                                    <i class="far fa-credit-card me-2"></i> <span th:text="${card.cardNumber}"></span><br><span th:text="${card.cardHolderName}"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> Your payment will be processed securely.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmPaymentBtn">
+                        <i class="fas fa-check"></i> Confirm Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Customer Support</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-phone-alt fa-3x text-primary mb-3"></i>
+                                    <h5>Call Us</h5>
+                                    <p class="mb-1">+91 9876543210</p>
+                                    <p class="text-muted small">Available 24/7</p>
+                                    <button class="btn btn-outline-primary mt-2">
+                                        <i class="fas fa-phone me-2"></i> Call Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+                                    <h5>Email Us</h5>
+                                    <p class="mb-1">support@dailynews.com</p>
+                                    <p class="text-muted small">Response within 24 hours</p>
+                                    <button class="btn btn-outline-primary mt-2">
+                                        <i class="fas fa-envelope me-2"></i> Send Email
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar on mobile
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            
+            toggleSidebar.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+            });
+            
+            // Section navigation
+            const navLinks = document.querySelectorAll('.sidebar .nav-link, [data-section]');
+            const sections = document.querySelectorAll('.section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Close sidebar on mobile after clicking a link
+                    if (window.innerWidth < 992) {
+                        sidebar.classList.remove('show');
+                    }
+                    
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId) {
+                        // Hide all sections
+                        sections.forEach(section => {
+                            section.classList.remove('active');
+                        });
+                        
+                        // Show the selected section
+                        document.getElementById(`${sectionId}-section`).classList.add('active');
+                        
+                        // Update active nav link
+                        document.querySelectorAll('.sidebar .nav-link').forEach(navLink => {
+                            navLink.classList.remove('active');
+                        });
+                        
+                        // Find the corresponding sidebar link and activate it
+                        const sidebarLink = document.querySelector(`.sidebar .nav-link[data-section="${sectionId}"]`);
+                        if (sidebarLink) {
+                            sidebarLink.classList.add('active');
+                        }
+                    }
+                });
+            });
+            
+            // Handle subscription buttons
+            document.querySelectorAll('.subscribe-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.getAttribute('data-paper-name');
+                    const monthlyPrice = parseFloat(this.getAttribute('data-paper-monthlyPrice'));
+                    const yearlyPrice = parseFloat(this.getAttribute('data-paper-yearlyPrice'));
+                    const paperId = this.getAttribute('data-paper-id');
+
+                    // Set modal display values
+                    document.getElementById('newspaperName').textContent = name;
+                    document.getElementById('monthlyLabel').textContent = `Monthly - ₹${monthlyPrice.toFixed(2)}`;
+                    document.getElementById('yearlyLabel').textContent = `Yearly - ₹${yearlyPrice.toFixed(2)} (Save 15%)`;
+
+                    // Hidden input defaults
+                    document.getElementById('newsPaperId').value = paperId;
+                    document.getElementById('paperName').value = name;
+                    document.getElementById('selectedBillingCycle').value = "MONTHLY";
+                    document.getElementById('selectedPrice').value = monthlyPrice.toFixed(2);
+
+                    // Default selection
+                    document.getElementById('monthly').checked = true;
+
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('subscribeModal'));
+                    modal.show();
+                });
+            });
+
+            // Update hidden fields on radio change
+            document.querySelectorAll('input[name="billingCycleOption"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isMonthly = this.id === 'monthly';
+                    const priceText = document.getElementById(isMonthly ? 'monthlyLabel' : 'yearlyLabel').textContent;
+                    const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
+
+                    document.getElementById('selectedBillingCycle').value = isMonthly ? "MONTHLY" : "YEARLY";
+                    document.getElementById('selectedPrice').value = price.toFixed(2);
+                });
+            });
+
+            // Proceed to payment button in subscription modal
+            document.getElementById('proceedToPaymentBtn').addEventListener('click', function() {
+                // Check if address section exists and is visible
+                const addressSection = document.getElementById('customerAddress').value;
+                
+                if (addressSection == null) {
+                    alert("Please update your address in the Profile section before proceeding.");
+                    return; // ❌ Stop here
+                }
+                
+                const paperId = document.getElementById('newsPaperId').value;
+                const paperName = document.getElementById('paperName').value;
+                const paperPlan = document.getElementById('selectedBillingCycle').value;
+                const price = document.getElementById('selectedPrice').value;
+                
+                const subscription = {"paperId":paperId,"paperName":paperName,"paperPlan":paperPlan,"paperPrice":price};
+                
+                document.getElementById('subscriptionAmount1').innerText = '₹' + price;
+                document.getElementById('subscriptionAmount2').innerText = '₹' + price;
+                document.getElementById('paymentDetails').innerText = JSON.stringify(subscription);
+                
+                const subscribeModal = bootstrap.Modal.getInstance(document.getElementById('subscribeModal'));
+                subscribeModal.hide();
+                
+                const paymentModal = new bootstrap.Modal(document.getElementById('paymentConfirmationModal'));
+                paymentModal.show();
+            });
+            
+            // Confirm payment button
+            document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
+                showLoading();
+                
+                const subscription = JSON.parse(document.getElementById('paymentDetails').textContent);
+                const cardId = document.querySelector('input[name="cardId"]:checked').value;
+
+                const params = new URLSearchParams();
+                params.append("paperId", subscription.paperId);
+                params.append("paperName", subscription.paperName);
+                params.append("paperPlan", subscription.paperPlan);
+                params.append("paperPrice", subscription.paperPrice);
+                params.append("cardId", cardId);
+
+                fetch('/customer/newspaper/subscribe?' + params.toString(), {
+                    method: 'POST'
+                })
+                .then(res => {
+                    if (res.ok) {
+                        return res.text();
+                    }
+                    throw new Error('Payment failed');
+                })
+                .then(data => {
+                    hideLoading();
+                    showToast('Payment successful! Your subscription has been activated.', 'success');
+                    
+                    const paymentModal = bootstrap.Modal.getInstance(document.getElementById('paymentConfirmationModal'));
+                    paymentModal.hide();
+                    
+                    // Update active subscriptions count
+                    const countElement = document.getElementById('activeSubscriptionsCount');
+                    countElement.textContent = parseInt(countElement.textContent) + 1;
+                    
+                    // Reload the page after 2 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                })
+                .catch(err => {
+                    hideLoading();
+                    showToast('Payment failed: ' + err.message, 'error');
+                    console.error("Error:", err);
+                });
+            });
+            
+            // Handle payment method deletion
+            document.querySelectorAll('.delete-card').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const cardId = this.getAttribute('data-card-id');
+                    if (confirm('Are you sure you want to delete this payment method?')) {
+                        showLoading();
+                        
+                        fetch(`/customer/card/delete/${cardId}`, {
+                            method: 'DELETE'
+                        })
+                        .then(res => {
+                            if (res.ok) {
+                                return res.text();
+                            }
+                            throw new Error('Failed to delete card');
+                        })
+                        .then(data => {
+                            hideLoading();
+                            showToast('Payment method deleted successfully!', 'success');
+                            this.closest('.col-md-6').remove();
+                        })
+                        .catch(err => {
+                            hideLoading();
+                            showToast('Failed to delete payment method', 'error');
+                            console.error("Error:", err);
+                        });
+                    }
+                });
+            });
+
+            // Subscription details modal
+            document.querySelectorAll('[data-bs-target="#subscriptionDetailsModal"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('subscriptionPaperName').textContent = this.getAttribute('data-paper-name');
+                    document.getElementById('subscriptionLanguage').textContent = this.getAttribute('data-paper-language');
+                    document.getElementById('subscriptionStartDate').textContent = this.getAttribute('data-start-date');
+                    document.getElementById('subscriptionNextBilling').textContent = this.getAttribute('data-next-billing');
+                    document.getElementById('subscriptionBillingCycle').textContent = this.getAttribute('data-billing-cycle');
+                    document.getElementById('subscriptionPrice').textContent = this.getAttribute('data-price');
+                    document.getElementById('subscriptionStatus').textContent = this.getAttribute('data-status');
+                });
+            });
+
+            // Delivery details modal
+            document.querySelectorAll('[data-bs-target="#deliveryDetailsModal"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('deliveryNewspaper').textContent = this.getAttribute('data-newspaper');
+                    document.getElementById('deliveryTime').textContent = this.getAttribute('data-delivery-time');
+                    document.getElementById('deliveryBoy').textContent = this.getAttribute('data-delivery-boy');
+                    document.getElementById('deliveryBoyPhone').textContent = this.getAttribute('data-delivery-boy-phone');
+                });
+            });
+
+            // Feedback form submission
+            document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!document.querySelector('input[name="rating"]:checked')) {
+                    showToast('Please select a rating', 'error');
+                    return;
+                }
+                
+                showLoading();
+                
+                const formData = new FormData(this);
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => {
+                    if (res.ok) {
+                        return res.text();
+                    }
+                    throw new Error('Feedback submission failed');
+                })
+                .then(data => {
+                    hideLoading();
+                    showToast('Thank you for your feedback!', 'success');
+                    // Reload the page to show the new feedback
+                    window.location.reload();
+                })
+                .catch(err => {
+                    hideLoading();
+                    showToast('Failed to submit feedback', 'error');
+                    console.error("Error:", err);
+                });
+            });
+
+            // Profile image upload preview
+            document.getElementById('profileImageUpload')?.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('profileImagePreview').src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Change password form
+            document.getElementById('change-password-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Get form elements
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                const errorElement = document.getElementById('password-error');
+                const successElement = document.getElementById('password-success');
+                const submitButton = this.querySelector('button[type="submit"]');
+                
+                // Reset messages
+                errorElement.style.display = 'none';
+                successElement.style.display = 'none';
+                
+                // Validate
+                if (newPassword !== confirmPassword) {
+                    errorElement.textContent = "New passwords don't match";
+                    errorElement.style.display = 'inline';
+                    return;
+                }
+                
+                if (newPassword.length < 4) {
+                    errorElement.textContent = "Password must be at least 4 characters";
+                    errorElement.style.display = 'inline';
+                    return;
+                }
+                
+                // Disable button during request
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                try {
+                    // Make API call to change password
+                    const response = await fetch('/customer/password/change', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'currentPassword': currentPassword,
+                            'newPassword': newPassword
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        // Password changed successfully
+                        successElement.textContent = "Password changed successfully! You will be logged out shortly.";
+                        successElement.style.display = 'inline';
+                        
+                        // Reset form
+                        this.reset();
+                        
+                        // Redirect to logout after 3 seconds
+                        setTimeout(() => {
+                            window.location.href = '/customer/logout';
+                        }, 3000);
+                    } else {
+                        // Handle server-side errors
+                        const errorData = await response.json();
+                        errorElement.textContent = errorData.message || "Failed to change password";
+                        errorElement.style.display = 'inline';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorElement.textContent = "Network error occurred. Please try again.";
+                    errorElement.style.display = 'inline';
+                } finally {
+                    // Re-enable button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                }
+            });
+            
+            // Show loading spinner
+            function showLoading() {
+                document.getElementById('loadingSpinner').style.display = 'flex';
+            }
+            
+            // Hide loading spinner
+            function hideLoading() {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+            
+            // Show toast notification
+            function showToast(message, type = 'info') {
+                const toastContainer = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 5000);
+                
+                // Close button
+                toast.querySelector('button').addEventListener('click', function() {
+                    toast.classList.add('hide');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                });
+            }
+            
+            // Newspaper search functionality
+            document.getElementById('newspaperSearch')?.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const newspapers = document.querySelectorAll('#newspapersContainer .col-md-4');
+                
+                newspapers.forEach(newspaper => {
+                    const name = newspaper.querySelector('h5').textContent.toLowerCase();
+                    const description = newspaper.querySelector('p').textContent.toLowerCase();
+                    
+                    if (name.includes(searchTerm) || description.includes(searchTerm)) {
+                        newspaper.style.display = 'block';
+                    } else {
+                        newspaper.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Newspaper filter functionality
+            document.getElementById('languageFilter')?.addEventListener('change', function() {
+                filterNewspapers();
+            });
+            
+            document.getElementById('priceFilter')?.addEventListener('change', function() {
+                filterNewspapers();
+            });
+            
+            function filterNewspapers() {
+                const languageFilter = document.getElementById('languageFilter').value;
+                const priceFilter = document.getElementById('priceFilter').value;
+                const newspapers = document.querySelectorAll('#newspapersContainer .col-md-4');
+                
+                newspapers.forEach(newspaper => {
+                    const language = newspaper.querySelector('.badge-language').textContent;
+                    const priceText = newspaper.querySelector('.monthlyPrice').textContent;
+                    const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
+                    
+                    let languageMatch = true;
+                    let priceMatch = true;
+                    
+                    if (languageFilter && language !== languageFilter) {
+                        languageMatch = false;
+                    }
+                    
+                    if (priceFilter) {
+                        const [min, max] = priceFilter.split('-').map(Number);
+                        
+                        if (priceFilter.endsWith('+')) {
+                            if (price < parseInt(priceFilter)) {
+                                priceMatch = false;
+                            }
+                        } else if (price < min || (max && price > max)) {
+                            priceMatch = false;
+                        }
+                    }
+                    
+                    if (languageMatch && priceMatch) {
+                        newspaper.style.display = 'block';
+                    } else {
+                        newspaper.style.display = 'none';
+                    }
+                });
+            }
+
+            // Card number formatting
+            document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+                let value = this.value.replace(/\D/g, '').substring(0, 16);
+                const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+                this.value = formatted;
+                this.setCustomValidity(value.length === 16 ? "" : "Card number must be 16 digits");
+            });
+
+            // Card expiry formatting
+            document.getElementById('cardExpiry')?.addEventListener('input', function(e) {
+                let value = this.value.replace(/\D/g, '').substring(0, 4);
+                if (value.length >= 3) {
+                    value = value.substring(0, 2) + '/' + value.substring(2);
+                }
+                this.value = value;
+
+                const [mm, yy] = value.split('/');
+                const isValid = mm >= 1 && mm <= 12 && yy?.length === 2;
+                this.setCustomValidity(isValid ? "" : "Enter valid expiry in MM/YY format");
+            });
+
+            // CVV validation
+            document.getElementById('cardCvv')?.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '').substring(0, 3);
+                this.value = value;
+                this.setCustomValidity(value.length === 3 ? "" : "CVV must be 3 digits");
+            });
+        });
+    </script>
+</body>
+</html>
