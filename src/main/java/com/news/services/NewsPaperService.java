@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +30,7 @@ import com.news.repositories.SubscriptionRepository;
 //import com.news.repositories.SubscriptionRepository;
 
 @Service
-public class NewsPaperService {
+public class NewsPaperService implements CommandLineRunner{
 
 	@Autowired
 	private NewsPaperRepository paperRepo;
@@ -42,6 +43,22 @@ public class NewsPaperService {
 
 	@Autowired
 	private EmployeeRepository empRepo;
+	
+	
+	@Override
+	public void run(String... args) throws Exception {
+		
+		List<Subscription> subs = subRepo.findAll();
+		
+		for (var sub : subs) {
+			if (sub.getEndDate().isBefore(LocalDate.now())) {
+				subRepo.delete(sub);
+			}
+		}
+		
+	}
+	
+	
 
 	public void addNewsPaper(String name, Language language, String description, MultipartFile image, String publisher,
 			BigDecimal monthlyPrice, BigDecimal yearlyPrice, boolean isActive) throws IOException {
@@ -190,5 +207,7 @@ public class NewsPaperService {
 		});
 		
 	}
+
+
 
 }

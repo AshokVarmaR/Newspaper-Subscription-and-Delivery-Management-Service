@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +46,13 @@ public class UserService {
 	
 	@Autowired
 	private OtpRepository otpRepo;
+	
+	
+	@Value("${spring.mail.username}")
+	private String mailSenderUsername;
+	
+	@Value("${spring.mail.password}")
+	private String mailSenderPassword;
 
 	public boolean addCustomer(String name, String email, String phone, String username, String password) {
 
@@ -322,7 +330,7 @@ public class UserService {
 
 	            // Send OTP via email
 	            SimpleMailMessage message = new SimpleMailMessage();
-	            message.setFrom("ashokvarma188@gmail.com");
+	            message.setFrom(mailSenderUsername);
 	            message.setTo(email);
 	            message.setSubject("Password Reset");
 	            message.setText("OTP to reset your Newspaper Account password is " + otp +". Do not share this with anyone.");
