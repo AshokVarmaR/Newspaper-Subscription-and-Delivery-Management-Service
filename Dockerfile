@@ -1,14 +1,12 @@
-# Use OpenJDK 21 base image
+# Stage 1: Build the JAR
+FROM eclipse-temurin:21-jdk as builder
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Run the JAR
 FROM eclipse-temurin:21-jdk
-
-# Argument to locate your JAR
-ARG JAR_FILE=target/*.jar
-
-# Copy the JAR into the container
-COPY ${JAR_FILE} app.jar
-
-# Expose the port (Render provides this dynamically)
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Start the Spring Boot application
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
